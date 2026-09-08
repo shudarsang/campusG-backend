@@ -1,0 +1,86 @@
+﻿"""
+academic_agent.py
+
+Academic Agent for CampusGuide AI.
+"""
+
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+from app.llm.gemini import llm
+from app.prompts.academic_prompt import ACADEMIC_PROMPT
+from app.rag.retriever import retriever
+from app.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+
+
+class AcademicAgent:
+
+    def __init__(self):
+
+        self.prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", ACADEMIC_PROMPT),
+                ("human", "Context:\n{context}\n\nQuestion:\n{question}")
+            ]
+        )
+
+        if llm is None:
+            self.chain = None
+            logger.warning("Gemini LLM unavailable; academic agent will use fallback responses.")
+        else:
+            self.chain = (
+                self.prompt
+                | llm
+                | StrOutputParser()
+            )
+
+    def answer(self, question: str):
+        """
+        Answer academic-related questions.
+
+        Returns a (response_text, source_documents) tuple.
+        """
+
+        try:
+
+            documents = retriever.retrieve(question)
+
+            context = "\n\n".join(
+                doc.page_content
+                for doc in documents
+            )
+
+            logger.info(
+                f"Retrieved {len(documents)} academic documents."
+            )
+
+            if self.chain is None:
+                return (
+                    "I’m currently unable to generate an academic response because the AI service is unavailable.",
+                    []
+                )
+
+            response = self.chain.invoke(
+                {
+                    "context": context,
+                    "question": question
+                }
+            )
+
+            return response, documents
+
+        except Exception as e:
+
+            logger.error(
+                f"Academic Agent Error: {e}"
+            )
+
+            return (
+                "Sorry, I couldn't process your academic query.",
+                []
+            )
+
+
+academic_agent = AcademicAgent()
