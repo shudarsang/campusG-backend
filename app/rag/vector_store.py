@@ -1,11 +1,9 @@
-﻿"""
+"""
 vector_store.py
 
 Creates, saves, and loads the FAISS vector database.
-Supports batch ingestion to avoid Gemini API rate limits.
 """
 
-import time
 from pathlib import Path
 from typing import List
 
@@ -33,12 +31,14 @@ class VectorStore:
     def create_vector_store(
         self,
         documents: List[Document],
-        batch_size: int = 20,
-        delay: int = 15
+        batch_size: int = 256,
     ) -> FAISS:
         """
-        Create FAISS Vector Store in batches to avoid
-        Gemini free-tier rate limits.
+        Build the FAISS index from chunked documents.
+
+        Embeddings are computed locally, so this no longer needs the
+        rate-limit backoff the Gemini embedding API required - the
+        whole knowledge base indexes in a few seconds.
         """
 
         logger.info("Creating FAISS Vector Store...")
@@ -47,59 +47,24 @@ class VectorStore:
             raise ValueError("No documents found.")
 
         vector_db = None
-
         total = len(documents)
 
         for start in range(0, total, batch_size):
 
             end = min(start + batch_size, total)
-
             batch = documents[start:end]
 
             logger.info(
-                f"Processing Batch {start // batch_size + 1} "
-                f"({start + 1}-{end}/{total})"
+                f"Embedding {start + 1}-{end} of {total}..."
             )
 
-            success = False
-
-            while not success:
-
-                try:
-
-                    if vector_db is None:
-
-                        vector_db = FAISS.from_documents(
-                            documents=batch,
-                            embedding=embeddings
-                        )
-
-                    else:
-
-                        vector_db.add_documents(batch)
-
-                    success = True
-
-                except Exception as e:
-
-                    logger.warning(
-                        f"Rate limit reached: {e}"
-                    )
-
-                    logger.info(
-                        f"Waiting {delay} seconds..."
-                    )
-
-                    time.sleep(delay)
-
-            # Wait between batches
-            if end < total:
-
-                logger.info(
-                    f"Sleeping {delay} seconds before next batch..."
+            if vector_db is None:
+                vector_db = FAISS.from_documents(
+                    documents=batch,
+                    embedding=embeddings
                 )
-
-                time.sleep(delay)
+            else:
+                vector_db.add_documents(batch)
 
         logger.info(
             "FAISS Vector Store Created Successfully."

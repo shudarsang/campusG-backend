@@ -1,4 +1,4 @@
-﻿"""
+"""
 constants.py
 
 Application-wide constants used across the CampusGuide AI backend.
@@ -30,10 +30,25 @@ METADATA_FILE = VECTOR_STORE_PATH / "metadata.pkl"
 # Chunking
 # ==========================================================
 
-DEFAULT_CHUNK_SIZE = 2000
-DEFAULT_CHUNK_OVERLAP = 200
+# Sections are split on Markdown headings, so most chunks land well
+# under this; the size only caps unusually long sections.
+DEFAULT_CHUNK_SIZE = 1000
+DEFAULT_CHUNK_OVERLAP = 120
 
-DEFAULT_TOP_K = 8
+# ==========================================================
+# Retrieval
+# ==========================================================
+
+# Chunks handed to the answering agent.
+DEFAULT_TOP_K = 6
+
+# Candidates pulled from each retriever (vector and keyword)
+# before fusion picks the final DEFAULT_TOP_K.
+CANDIDATE_POOL = 25
+
+# Weight of the vector ranking against the keyword ranking during
+# fusion. 0.5 keeps them equal; higher favours semantic matches.
+VECTOR_WEIGHT = 0.5
 
 # ==========================================================
 # Supported Agents

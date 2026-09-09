@@ -1,16 +1,30 @@
-﻿"""
+"""
 embeddings.py
 
-Initializes the Google Gemini Embedding Model.
-This embedding model is used by the RAG pipeline to generate
-vector embeddings for documents and user queries.
+Local embedding model used by the RAG pipeline.
+
+Embeddings run on-device through fastembed (ONNX). Two reasons this
+beats calling the Gemini embedding API:
+
+1. Speed - a query is embedded in ~15ms instead of a ~500ms network
+   round-trip, and that round-trip sat in front of every single
+   answer.
+2. Quota - embedding calls used to compete with chat calls for the
+   same free-tier allowance. Keeping retrieval local means the whole
+   API budget goes to actually answering questions.
+
+BGE models are trained with an asymmetric objective: passages and
+queries are encoded differently. fastembed exposes that as
+passage_embed() / query_embed(), and using the matching one on each
+side is what keeps ranking correct.
 """
 
 import os
 from pathlib import Path
+from typing import List, Optional
 
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_core.embeddings import Embeddings
 
 from app.utils.logger import setup_logger
 
@@ -19,42 +33,78 @@ load_dotenv(BASE_DIR / ".env")
 
 logger = setup_logger(__name__)
 
-# ------------------------------------------------------------------
-# Environment Variables
-# ------------------------------------------------------------------
-
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 EMBEDDING_MODEL = os.getenv(
     "EMBEDDING_MODEL",
-    "models/gemini-embedding-001"
+    "BAAI/bge-small-en-v1.5"
 )
 
-# ------------------------------------------------------------------
-# Initialize Embedding Model
-# ------------------------------------------------------------------
+# Keep the downloaded model inside the project. fastembed otherwise
+# caches into the system temp directory, which Windows clears - and
+# a cleared cache means a silent 70s re-download on next boot.
+EMBEDDING_CACHE_DIR = Path(
+    os.getenv("EMBEDDING_CACHE_DIR", str(BASE_DIR / "models"))
+)
 
-if not GOOGLE_API_KEY:
-    logger.warning("GOOGLE_API_KEY not found in .env; embeddings will be unavailable until configured.")
+
+class LocalEmbeddings(Embeddings):
+    """
+    LangChain Embeddings backed by a local fastembed model.
+    """
+
+    def __init__(
+        self,
+        model_name: str = EMBEDDING_MODEL,
+        cache_dir: Path = EMBEDDING_CACHE_DIR,
+    ):
+
+        from fastembed import TextEmbedding
+
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
+        self.model_name = model_name
+
+        self._model = TextEmbedding(
+            model_name=model_name,
+            cache_dir=str(cache_dir),
+        )
+
+        self.dimension = self._model.embedding_size
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """
+        Embed knowledge-base passages (ingestion side).
+        """
+
+        return [
+            vector.tolist()
+            for vector in self._model.passage_embed(texts)
+        ]
+
+    def embed_query(self, text: str) -> List[float]:
+        """
+        Embed a user question (search side).
+        """
+
+        vector = next(iter(self._model.query_embed([text])))
+
+        return vector.tolist()
+
+
+embeddings: Optional[LocalEmbeddings]
+
+try:
+
+    embeddings = LocalEmbeddings()
+
+    logger.info(
+        f"Embedding Model Loaded Successfully: {EMBEDDING_MODEL} "
+        f"(local, {embeddings.dimension}d)"
+    )
+
+except Exception as e:
+
+    logger.error(
+        f"Failed to initialize embedding model: {e}"
+    )
+
     embeddings = None
-else:
-    try:
-        # No fixed task_type here: leaving it unset lets the
-        # library default to RETRIEVAL_DOCUMENT for embed_documents()
-        # (ingestion) and RETRIEVAL_QUERY for embed_query() (search),
-        # which is required for correct similarity ranking. Pinning
-        # task_type to "retrieval_document" here would force queries
-        # into the same space as documents and skew retrieval.
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model=EMBEDDING_MODEL,
-            google_api_key=GOOGLE_API_KEY,
-        )
-
-        logger.info(
-            f"Embedding Model Loaded Successfully: {EMBEDDING_MODEL}"
-        )
-
-    except Exception as e:
-        logger.error(
-            f"Failed to initialize embedding model: {e}"
-        )
-        embeddings = None
