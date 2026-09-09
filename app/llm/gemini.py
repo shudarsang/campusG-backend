@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -17,6 +17,10 @@ TEMPERATURE = float(os.getenv("TEMPERATURE", "0.4"))
 MAX_OUTPUT_TOKENS = int(os.getenv("MAX_OUTPUT_TOKENS", "1024"))
 TOP_P = float(os.getenv("TOP_P", "0.95"))
 TOP_K = int(os.getenv("TOP_K", "40"))
+# Gemini 3.x models think by default, and those thoughts are billed against
+# max_output_tokens - leaving too few tokens for the visible answer. RAG
+# answers are grounded in retrieved context, so thinking is not needed here.
+THINKING_BUDGET = int(os.getenv("THINKING_BUDGET", "0"))
 
 if not GOOGLE_API_KEY:
     logger.warning("GOOGLE_API_KEY not found in .env; Gemini chat will be unavailable until configured.")
@@ -29,5 +33,6 @@ else:
         max_output_tokens=MAX_OUTPUT_TOKENS,
         top_p=TOP_P,
         top_k=TOP_K,
+        thinking_budget=THINKING_BUDGET,
     )
     logger.info(f"Loaded Gemini Model: {LLM_MODEL}")
