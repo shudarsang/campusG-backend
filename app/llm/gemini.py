@@ -12,7 +12,7 @@ load_dotenv(BASE_DIR / ".env")
 logger = setup_logger(__name__)
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-3.5-flash")
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.4"))
 MAX_OUTPUT_TOKENS = int(os.getenv("MAX_OUTPUT_TOKENS", "1024"))
 TOP_P = float(os.getenv("TOP_P", "0.95"))
