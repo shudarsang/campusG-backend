@@ -1,15 +1,16 @@
-﻿"""
+"""
 general_agent.py
 
 General Information Agent for CampusGuide AI.
 """
 
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 
 from app.llm.gemini import llm
 from app.prompts.general_prompt import GENERAL_PROMPT
 from app.rag.retriever import retriever
+from app.utils.conversation import search_query, to_messages
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -25,6 +26,7 @@ class GeneralAgent:
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", GENERAL_PROMPT),
+                MessagesPlaceholder("history"),
                 ("human", "Context:\n{context}\n\nQuestion:\n{question}")
             ]
         )
@@ -39,7 +41,7 @@ class GeneralAgent:
                 | StrOutputParser()
             )
 
-    def answer(self, question: str):
+    def answer(self, question: str, history=None):
         """
         Generate a general college-related response.
 
@@ -48,7 +50,11 @@ class GeneralAgent:
 
         try:
 
-            documents = retriever.retrieve(question)
+            history = history or []
+
+            documents = retriever.retrieve(
+                search_query(question, history)
+            )
 
             context = "\n\n".join(
                 document.page_content
@@ -68,7 +74,8 @@ class GeneralAgent:
             response = self.chain.invoke(
                 {
                     "context": context,
-                    "question": question
+                    "question": question,
+                    "history": to_messages(history)
                 }
             )
 

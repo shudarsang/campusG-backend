@@ -51,6 +51,19 @@ CANDIDATE_POOL = 25
 VECTOR_WEIGHT = 0.5
 
 # ==========================================================
+# Conversation
+# ==========================================================
+
+# Recent turns replayed to the model so follow-up questions work.
+# Each turn costs prompt tokens, so this is deliberately short.
+MAX_HISTORY_TURNS = 10
+
+# A follow-up this short ("okay", "what about fees?") carries too
+# little on its own to search with, so the previous question is
+# folded into the retrieval query.
+FOLLOW_UP_WORD_LIMIT = 6
+
+# ==========================================================
 # Supported Agents
 # ==========================================================
 
@@ -100,15 +113,19 @@ CAMPUS_TOPICS = [
     "facility"
 ]
 
+# "about" and "college" were removed deliberately: they appear in
+# almost every question put to a college assistant ("what about the
+# fees", "does the college offer..."), so they won the keyword vote
+# against the real subject and sent everything to the general agent.
+# General is the fallback anyway, so it loses nothing by being less
+# eager.
 GENERAL_TOPICS = [
-    "about",
     "history",
     "vision",
     "mission",
     "ranking",
     "contact",
     "principal",
-    "college",
     "location",
     "news"
 ]

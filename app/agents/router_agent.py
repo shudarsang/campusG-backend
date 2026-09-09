@@ -21,6 +21,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 from app.llm.gemini import llm
 from app.prompts.router_prompt import ROUTER_PROMPT
+from app.utils.conversation import has_subject, last_user_question
 from app.utils.constants import (
     ACADEMIC_TOPICS,
     ADMISSION_TOPICS,
@@ -147,18 +148,40 @@ class RouterAgent:
 
             return None
 
-    def route(self, question: str) -> str:
+    def route(self, question: str, history=None) -> str:
         """
         Determine which agent should handle the query.
+
+        A pure continuation ("okay", "tell me more") names no topic,
+        so it inherits the routing of the question before it. The
+        question's own words are always tried first - concatenating
+        it with the previous turn instead drags in generic words
+        ("college", "about") that outvote the real subject.
 
         Returns: admission | academic | campus | general
         """
 
-        return (
-            self._keyword_route(question)
-            or self._llm_route(question)
-            or "general"
-        )
+        by_question = self._keyword_route(question)
+
+        if by_question:
+            return by_question
+
+        if not has_subject(question):
+
+            previous = last_user_question(history or [])
+
+            if previous:
+
+                inherited = self._keyword_route(previous)
+
+                if inherited:
+                    logger.info(
+                        f"Follow-up inherited '{inherited}' from the "
+                        f"previous question."
+                    )
+                    return inherited
+
+        return self._llm_route(question) or "general"
 
 
 router = RouterAgent()

@@ -1,15 +1,16 @@
-﻿"""
+"""
 admission_agent.py
 
 Admission Agent for CampusGuide AI.
 """
 
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 
 from app.llm.gemini import llm
 from app.prompts.admission_prompt import ADMISSION_PROMPT
 from app.rag.retriever import retriever
+from app.utils.conversation import search_query, to_messages
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -22,6 +23,7 @@ class AdmissionAgent:
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", ADMISSION_PROMPT),
+                MessagesPlaceholder("history"),
                 ("human", "Context:\n{context}\n\nQuestion:\n{question}")
             ]
         )
@@ -36,7 +38,7 @@ class AdmissionAgent:
                 | StrOutputParser()
             )
 
-    def answer(self, question: str):
+    def answer(self, question: str, history=None):
         """
         Generate an admission-related answer.
 
@@ -45,7 +47,11 @@ class AdmissionAgent:
 
         try:
 
-            documents = retriever.retrieve(question)
+            history = history or []
+
+            documents = retriever.retrieve(
+                search_query(question, history)
+            )
 
             context = "\n\n".join(
                 doc.page_content for doc in documents
@@ -65,7 +71,8 @@ class AdmissionAgent:
             response = self.chain.invoke(
                 {
                     "context": context,
-                    "question": question
+                    "question": question,
+                    "history": to_messages(history)
                 }
             )
 

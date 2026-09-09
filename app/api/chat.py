@@ -1,4 +1,4 @@
-﻿"""
+"""
 chat.py
 
 Chat API endpoint for CampusGuide AI.
@@ -53,7 +53,7 @@ async def chat(request: ChatRequest):
         # Router Agent
         # ---------------------------------------
 
-        selected_agent = router.route(question)
+        selected_agent = router.route(question, request.history)
 
         logger.info(
             f"Selected Agent : {selected_agent}"
@@ -66,7 +66,8 @@ async def chat(request: ChatRequest):
         if selected_agent == "admission":
 
             response, documents = admission_agent.answer(
-                question
+                question,
+                request.history
             )
 
         # ---------------------------------------
@@ -76,7 +77,8 @@ async def chat(request: ChatRequest):
         elif selected_agent == "academic":
 
             response, documents = academic_agent.answer(
-                question
+                question,
+                request.history
             )
 
         # ---------------------------------------
@@ -86,7 +88,8 @@ async def chat(request: ChatRequest):
         elif selected_agent == "campus":
 
             response, documents = campus_agent.answer(
-                question
+                question,
+                request.history
             )
 
         # ---------------------------------------
@@ -96,7 +99,8 @@ async def chat(request: ChatRequest):
         else:
 
             response, documents = general_agent.answer(
-                question
+                question,
+                request.history
             )
 
         # ---------------------------------------

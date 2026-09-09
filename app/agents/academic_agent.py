@@ -1,15 +1,16 @@
-﻿"""
+"""
 academic_agent.py
 
 Academic Agent for CampusGuide AI.
 """
 
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 
 from app.llm.gemini import llm
 from app.prompts.academic_prompt import ACADEMIC_PROMPT
 from app.rag.retriever import retriever
+from app.utils.conversation import search_query, to_messages
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -22,6 +23,7 @@ class AcademicAgent:
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", ACADEMIC_PROMPT),
+                MessagesPlaceholder("history"),
                 ("human", "Context:\n{context}\n\nQuestion:\n{question}")
             ]
         )
@@ -36,7 +38,7 @@ class AcademicAgent:
                 | StrOutputParser()
             )
 
-    def answer(self, question: str):
+    def answer(self, question: str, history=None):
         """
         Answer academic-related questions.
 
@@ -45,7 +47,11 @@ class AcademicAgent:
 
         try:
 
-            documents = retriever.retrieve(question)
+            history = history or []
+
+            documents = retriever.retrieve(
+                search_query(question, history)
+            )
 
             context = "\n\n".join(
                 doc.page_content
@@ -65,7 +71,8 @@ class AcademicAgent:
             response = self.chain.invoke(
                 {
                     "context": context,
-                    "question": question
+                    "question": question,
+                    "history": to_messages(history)
                 }
             )
 
