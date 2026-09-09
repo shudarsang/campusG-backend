@@ -12,6 +12,7 @@ key. Only when every key has failed does the error reach the caller.
 
 import os
 import re
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, List, Optional
 
@@ -20,6 +21,7 @@ from langchain_core.runnables import Runnable, RunnableConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from app.llm.api_keys import ApiKey, key_pool
+from app.utils.errors import LLMUnavailableError, QuotaExhaustedError
 from app.utils.logger import setup_logger
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -62,6 +64,44 @@ CREDENTIAL_MARKERS = (
 )
 
 RETRY_DELAY_PATTERN = re.compile(r"retryDelay['\"]?\s*:\s*['\"](\d+)s")
+
+# Gemini names the quota that was hit. A "PerDay" quota will not
+# recover for hours, but the payload's retryDelay still suggests
+# ~48 seconds - so trusting that value made every request retry all
+# three dead keys, over and over, for the rest of the day.
+DAILY_QUOTA_MARKERS = ("perday", "per day", "requestsperday")
+
+# Google's free tier rolls over at midnight Pacific. Fixed offset
+# rather than a tz database, which is absent on some hosts; PST is
+# the later of the two boundaries, so this never under-waits.
+QUOTA_RESET_HOUR_UTC = 8
+
+
+def _is_daily_quota(error: Exception) -> bool:
+
+    text = str(error).lower().replace("_", "")
+
+    return any(marker in text for marker in DAILY_QUOTA_MARKERS)
+
+
+def _seconds_until_daily_reset() -> int:
+    """
+    Seconds until the free tier's daily counters roll over.
+    """
+
+    now = datetime.now(timezone.utc)
+
+    reset = now.replace(
+        hour=QUOTA_RESET_HOUR_UTC,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+
+    if reset <= now:
+        reset += timedelta(days=1)
+
+    return int((reset - now).total_seconds())
 
 
 def _classify(error: Exception) -> Optional[str]:
@@ -136,13 +176,11 @@ class RotatingGeminiChat(Runnable):
     ) -> Any:
 
         if key_pool.size == 0:
-            raise RuntimeError(
-                "No Gemini API keys configured. Add GOOGLE_API_KEY "
-                "entries to .env."
-            )
+            raise LLMUnavailableError()
 
         attempted: List[str] = []
         last_error: Optional[Exception] = None
+        daily = False
 
         # One shot per key, worst case.
         for _ in range(key_pool.size):
@@ -182,18 +220,37 @@ class RotatingGeminiChat(Runnable):
                     f"failing over to the next key."
                 )
 
-                key_pool.penalise(
-                    key,
-                    retry_after=_retry_after(error) if reason == "quota" else None,
-                )
+                if reason == "quota" and _is_daily_quota(error):
+                    daily = True
+                    cooldown = _seconds_until_daily_reset()
+                elif reason == "quota":
+                    cooldown = _retry_after(error)
+                else:
+                    cooldown = None
 
+                key_pool.penalise(key, retry_after=cooldown)
+
+        # Keys still cooling down are not retried, so `attempted`
+        # can be shorter than the pool - say which, rather than
+        # implying the pool only has that many keys.
         logger.error(
-            f"All Gemini keys failed ({', '.join(attempted)})."
+            f"No usable Gemini key: tried {len(attempted)} of "
+            f"{key_pool.size} ({', '.join(attempted)})"
+            + (" - daily limit reached." if daily else ".")
         )
 
-        raise last_error if last_error else RuntimeError(
-            "No usable Gemini API key."
-        )
+        if last_error is None:
+            raise LLMUnavailableError()
+
+        # For a daily cap the payload's retryDelay (~48s) is wrong -
+        # tell the caller when the quota actually rolls over.
+        raise QuotaExhaustedError(
+            retry_after=(
+                _seconds_until_daily_reset()
+                if daily else _retry_after(last_error)
+            ),
+            daily=daily,
+        ) from last_error
 
 
 llm: Optional[RotatingGeminiChat]

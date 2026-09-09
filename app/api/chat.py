@@ -4,7 +4,7 @@ chat.py
 Chat API endpoint for CampusGuide AI.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 
 from app.models.request import ChatRequest
 from app.models.response import ChatResponse, Source
@@ -17,6 +17,7 @@ from app.agents.academic_agent import academic_agent
 from app.agents.campus_agent import campus_agent
 from app.agents.general_agent import general_agent
 
+from app.utils.errors import CampusGuideError
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -28,7 +29,7 @@ router_api = APIRouter()
     "/chat",
     response_model=ChatResponse
 )
-async def chat(request: ChatRequest):
+async def chat(request: ChatRequest, response: Response):
 
     try:
 
@@ -134,9 +135,38 @@ async def chat(request: ChatRequest):
 
         )
 
+    except CampusGuideError as e:
+
+        # A cause we understand - say so plainly instead of
+        # returning the same apology used for genuine bugs.
+        logger.warning(
+            f"{e.code}: {e.user_message}"
+        )
+
+        response.status_code = e.status_code
+
+        retry_after = getattr(e, "retry_after", None)
+
+        if retry_after:
+            response.headers["Retry-After"] = str(int(retry_after))
+
+        return ChatResponse(
+
+            success=False,
+
+            agent="system",
+
+            response=e.user_message,
+
+            sources=[],
+
+            error=e.code
+
+        )
+
     except Exception as e:
 
-        logger.error(e)
+        logger.exception(f"Unhandled chat error: {e}")
 
         raise HTTPException(
 

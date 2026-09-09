@@ -11,6 +11,7 @@ from app.llm.gemini import llm
 from app.prompts.general_prompt import GENERAL_PROMPT
 from app.rag.retriever import retriever
 from app.utils.conversation import search_query, to_messages
+from app.utils.errors import AgentError, CampusGuideError
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -81,16 +82,19 @@ class GeneralAgent:
 
             return response, documents
 
+        except CampusGuideError:
+            # Quota and configuration failures are explained to the
+            # user by the endpoint. Swallowing them here is what made
+            # a spent API key look like a crash.
+            raise
+
         except Exception as e:
 
             logger.error(
                 f"General Agent Error: {e}"
             )
 
-            return (
-                "Sorry, I couldn't process your request at the moment.",
-                []
-            )
+            raise AgentError() from e
 
 
 general_agent = GeneralAgent()
