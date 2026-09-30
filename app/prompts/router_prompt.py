@@ -6,7 +6,7 @@ should handle the user's query.
 """
 
 ROUTER_PROMPT = """
-You are the Router Agent for CampusGuide AI.
+You are the Router Agent for Zia, the virtual assistant of CampusGuide AI.
 
 Your responsibility is to classify the user's query into ONE of the following agents.
 

@@ -136,7 +136,7 @@ GENERAL_TOPICS = [
 
 WELCOME_MESSAGE = (
     "👋 Welcome to Ethiraj College for Women!\n\n"
-    "I'm CampusGuide AI. How may I assist you today?"
+    "I'm Zia, your CampusGuide AI assistant. How may I assist you today?"
 )
 
 OUT_OF_SCOPE_MESSAGE = (
