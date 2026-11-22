@@ -79,20 +79,14 @@ LIVE_ALLOWED_ORIGINS = {
 # Retrieved text handed back to the model per search.
 MAX_CONTEXT_CHARS = 5000
 
-LANGUAGES = {
-    "en-IN": "English",
-    "hi-IN": "Hindi",
-    "ta-IN": "Tamil",
-    "te-IN": "Telugu",
-    "ml-IN": "Malayalam",
-}
-
 SYSTEM_PROMPT = """You are Zia, the friendly voice assistant of Ethiraj \
 College for Women (Autonomous), Egmore, Chennai. You are talking to a \
 student or parent in a live voice conversation.
 
-Language: speak {language}. If the user clearly switches to another \
-language, reply in the language they are speaking. Keep course names \
+Language: always reply in the same language the user is speaking - \
+usually English, Hindi, Tamil, Telugu or Malayalam. If they switch \
+language mid-conversation, switch with them. If they mix English words \
+into another language, reply the same natural way. Keep course names \
 and proper nouns (B.Com., MCA, TANCET, NAAC) as they are usually said.
 
 Facts: for ANY question about the college - admissions, eligibility, \
@@ -142,11 +136,11 @@ SEARCH_TOOL = types.Tool(
 )
 
 
-def _config(language: str) -> types.LiveConnectConfig:
+def _config() -> types.LiveConnectConfig:
 
     return types.LiveConnectConfig(
         response_modalities=[types.Modality.AUDIO],
-        system_instruction=SYSTEM_PROMPT.format(language=language),
+        system_instruction=SYSTEM_PROMPT,
         tools=[SEARCH_TOOL],
         speech_config=types.SpeechConfig(
             voice_config=types.VoiceConfig(
@@ -174,7 +168,7 @@ async def _send_json(ws: WebSocket, **payload) -> None:
     await ws.send_text(json.dumps(payload, ensure_ascii=False))
 
 
-async def _open_session(stack: contextlib.AsyncExitStack, language: str):
+async def _open_session(stack: contextlib.AsyncExitStack):
     """
     Connect to Gemini Live, trying each API key in turn.
 
@@ -207,12 +201,11 @@ async def _open_session(stack: contextlib.AsyncExitStack, language: str):
         try:
             session = await stack.enter_async_context(
                 client.aio.live.connect(
-                    model=LIVE_MODEL, config=_config(language)
+                    model=LIVE_MODEL, config=_config()
                 )
             )
             logger.info(
-                f"Live session opened ({LIVE_MODEL}, {language}, "
-                f"key '{key.label}')."
+                f"Live session opened ({LIVE_MODEL}, key '{key.label}')."
             )
             return session
 
@@ -343,7 +336,7 @@ async def _gemini_to_browser(ws: WebSocket, session) -> None:
 
 
 @live_api.websocket("/live")
-async def live(ws: WebSocket, lang: str = "en-IN"):
+async def live(ws: WebSocket):
 
     origin = (ws.headers.get("origin") or "").rstrip("/")
 
@@ -354,12 +347,10 @@ async def live(ws: WebSocket, lang: str = "en-IN"):
 
     await ws.accept()
 
-    language = LANGUAGES.get(lang, "English")
-
     async with contextlib.AsyncExitStack() as stack:
 
         try:
-            session = await _open_session(stack, language)
+            session = await _open_session(stack)
         except CampusGuideError as e:
             await _send_json(ws, type="error", message=e.user_message)
             await ws.close()
