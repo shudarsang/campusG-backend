@@ -37,14 +37,12 @@ AGENTS = {
 def answer_question(
     message: str,
     history: Sequence,
-    reply_style: str = "",
 ) -> Tuple[str, str, List[Source]]:
     """
     Run one question through guardrails, routing and an agent.
 
-    Shared by the text and voice endpoints. Returns
-    (agent_name, response_text, sources). CampusGuideError is left
-    to the caller, which knows how to report it.
+    Returns (agent_name, response_text, sources). CampusGuideError
+    is left to the caller, which knows how to report it.
     """
 
     # ---------------------------------------
@@ -70,11 +68,7 @@ def answer_question(
 
     agent = AGENTS.get(selected_agent, general_agent)
 
-    text, documents = agent.answer(
-        question,
-        history,
-        reply_style=reply_style,
-    )
+    text, documents = agent.answer(question, history)
 
     # ---------------------------------------
     # Sources (deduplicated by source file + topic)
@@ -104,7 +98,7 @@ def error_response(e: CampusGuideError, response: Response) -> dict:
     """
     Log an explainable failure and set the HTTP status/headers.
 
-    Returns the fields shared by the chat and voice error payloads.
+    Returns the fields of the error ChatResponse.
     """
 
     # A cause we understand - say so plainly instead of
