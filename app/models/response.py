@@ -54,3 +54,29 @@ class ChatResponse(BaseModel):
         default=None,
         description="Error message if request fails"
     )
+
+
+class VoiceResponse(ChatResponse):
+    """
+    Voice reply: the chat response plus what was heard and the audio.
+    """
+
+    transcript: str = Field(
+        default="",
+        description="What the user said, in the script they spoke"
+    )
+
+    language: str = Field(
+        default="en-IN",
+        description="Language of the reply"
+    )
+
+    audio: Optional[str] = Field(
+        default=None,
+        description="Base64 WAV of the spoken reply; null if TTS failed"
+    )
+
+    audio_mime: Optional[str] = Field(
+        default=None,
+        description="MIME type of `audio`"
+    )

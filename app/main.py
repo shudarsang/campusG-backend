@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.chat import router_api
+from app.api.voice import voice_api
 from app.llm.api_keys import key_pool
 from app.llm.gemini import LLM_MODEL
 from app.utils.logger import setup_logger
@@ -54,6 +55,16 @@ app.include_router(
     prefix="/api",
 
     tags=["Chat"]
+
+)
+
+app.include_router(
+
+    voice_api,
+
+    prefix="/api",
+
+    tags=["Voice"]
 
 )
 

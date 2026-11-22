@@ -21,7 +21,7 @@ side is what keeps ranking correct.
 
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from dotenv import load_dotenv
 from langchain_core.embeddings import Embeddings
@@ -79,6 +79,27 @@ class LocalEmbeddings(Embeddings):
             vector.tolist()
             for vector in self._model.passage_embed(texts)
         ]
+
+    def known_words(self) -> Set[str]:
+        """
+        Whole English words in the model's tokenizer vocabulary.
+
+        Used by the retriever's spelling corrector as a dictionary: a
+        word the tokenizer knows ("parking", "seats") is a real word,
+        not a typo, and must not be "corrected" into some knowledge-
+        base word that happens to be one letter away.
+        """
+
+        try:
+            vocabulary = self._model.model.tokenizer.get_vocab()
+        except Exception as e:
+            logger.warning(f"Tokenizer vocabulary unavailable: {e}")
+            return set()
+
+        return {
+            word for word in vocabulary
+            if word.isalpha() and not word.startswith("##")
+        }
 
     def embed_query(self, text: str) -> List[float]:
         """

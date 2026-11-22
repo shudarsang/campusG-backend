@@ -49,3 +49,36 @@ class ChatRequest(BaseModel):
         max_length=MAX_HISTORY_TURNS,
         description="Recent conversation turns, oldest first"
     )
+
+
+class VoiceRequest(BaseModel):
+    """
+    Incoming voice question: a short recording plus chat history.
+    """
+
+    # Base64 keeps this a plain JSON request (no multipart parsing).
+    # ~4 MB of base64 is ~90 s of 16 kHz mono WAV - far more than a
+    # spoken question needs, while still bounding the upload.
+    audio: str = Field(
+        ...,
+        min_length=1,
+        max_length=4_000_000,
+        description="Base64-encoded recording"
+    )
+
+    mime_type: str = Field(
+        default="audio/wav",
+        max_length=100,
+        description="MIME type of the recording"
+    )
+
+    language: Literal["en-IN", "hi-IN", "ta-IN", "te-IN", "ml-IN"] = Field(
+        default="en-IN",
+        description="Language the user speaks and wants replies in"
+    )
+
+    history: List[ChatTurn] = Field(
+        default_factory=list,
+        max_length=MAX_HISTORY_TURNS,
+        description="Recent conversation turns, oldest first"
+    )

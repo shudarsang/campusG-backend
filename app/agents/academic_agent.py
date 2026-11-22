@@ -10,7 +10,7 @@ from langchain_core.output_parsers import StrOutputParser
 from app.llm.gemini import llm
 from app.prompts.academic_prompt import ACADEMIC_PROMPT
 from app.rag.retriever import retriever
-from app.utils.conversation import search_query, to_messages
+from app.utils.conversation import search_query, to_messages, with_reply_style
 from app.utils.errors import AgentError, CampusGuideError
 from app.utils.logger import setup_logger
 
@@ -39,7 +39,7 @@ class AcademicAgent:
                 | StrOutputParser()
             )
 
-    def answer(self, question: str, history=None):
+    def answer(self, question: str, history=None, reply_style: str = ""):
         """
         Answer academic-related questions.
 
@@ -72,7 +72,7 @@ class AcademicAgent:
             response = self.chain.invoke(
                 {
                     "context": context,
-                    "question": question,
+                    "question": with_reply_style(question, reply_style),
                     "history": to_messages(history)
                 }
             )

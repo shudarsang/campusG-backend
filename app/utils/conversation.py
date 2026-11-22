@@ -101,6 +101,22 @@ def last_user_question(history: Sequence) -> str:
     return ""
 
 
+def with_reply_style(question: str, reply_style: str = "") -> str:
+    """
+    The question as the LLM sees it, plus any answer-format
+    instruction (voice replies ask for short, plain spoken text in
+    the user's language).
+
+    Kept separate from the question used for retrieval, so the
+    instruction's words never leak into the search.
+    """
+
+    if not reply_style:
+        return question
+
+    return f"{question}\n\n({reply_style})"
+
+
 def search_query(question: str, history: Sequence) -> str:
     """
     Build the query used for retrieval.
