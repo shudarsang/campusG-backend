@@ -26,7 +26,7 @@ CASES = [
     ("who gets priority for hostel seats", [r"first-generation learners, students with disab"]),
     ("how do i get a hostel room", [r"first-come"]),
     ("library timing", [r"9:00 a\.m\. to 4:00 p\.m"]),
-    ("what time does college start and end", [r"2:15"]),
+    ("what time does college start and end", [r"2[:.]15"]),
     ("which sports can i play here", [r"kabaddi|throwball|basketball, volleyball"]),
     ("indoor stadium cost", [r"5 crores"]),
     ("is there a gym", [r"gym facility available within the hostel|within the hostel"]),
@@ -67,7 +67,7 @@ CASES = [
     ("how long is mca", [r"2[- ]years?|two years"]),
     ("when did the mca course start", [r"\b1999\b"]),
     ("hod of computer science", [r"Jane Nithya"]),
-    ("how many ug courses are there", [r"UG Programmes:\*\* 19|\b19\b.*UG|UG.*\b19\b"]),
+    ("how many ug courses are there", [r"UG Programmes:\*\* 30|\b30 (?:UG|undergraduate)"]),
     ("bsc microbiology duration", [r"Microbiology[\s\S]*3 Years"]),
     ("bcom bank management department", [r"Bank Management[\s\S]*Commerce"]),
     # One-word and generic questions, where near-duplicate FAQ

@@ -2,11 +2,11 @@
 
 ## Summary Statistics
 
-- **UG Programmes:** 19 (per 2021 brochure); 30 (per 2022-23 academic calendar, a later count reflecting more sections/streams)
-- **PG Programmes:** 30 (per 2021 brochure); 23 (per 2022-23 academic calendar, including AICTE-approved MBA and MCA)
-- **Research Programmes:** 12 (M.Phil. and Ph.D. combined, per 2021 brochure); 21 (per 2022-23 academic calendar)
-- **PhD Programmes:** 8
-- **Note:** Counts differ across official documents of different years; both figures are reproduced as published rather than reconciled.
+- **UG Programmes:** 30 (UG Prospectus 2026-27, across Aided and Self-Supporting streams)
+- **PG Programmes:** 26 including MBA and MCA (UG/MCA Prospectus 2026-27); the college website lists 24
+- **Ph.D Programmes:** 10 (offered under the University of Madras); 13 M.Phil courses were offered until 2023
+- **Older counts:** the 2021 brochure listed 19 UG and 30 PG programmes; these are superseded by the 2026-27 prospectus.
+- **Eligibility and fees:** programme-wise +2 eligibility is in the UG Prospectus 2026-27; fees are in the Fee Structure 2026-27.
 
 ## Undergraduate UG
 

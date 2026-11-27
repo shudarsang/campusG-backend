@@ -9,7 +9,7 @@
   - Fill 'Name' exactly as per the 12th mark sheet; Tamil name can be entered using tools like tamiltyping.in
   - CBSE board students need not give Part I language mark; other board students can add subjects via 'Add Row'
   - Choose correct subjects studied in +2 from the given options
-  - Upload a recent passport-size photograph (max size 100kb, jpg/jpeg only; school-uniform or selfie photos not accepted)
+  - Upload a recent passport-size photograph (max size 100 KB, JPG or GIF, 125 x 165 pixels; school-uniform or selfie photos not accepted)
   - Upload required documents (12th mark sheet, UG semester mark sheets as a single PDF, Community Certificate, TANCET hall ticket/mark sheet for applicable PG courses, etc.)
   - Pay the application/registration fee online and proceed
   - Download and save a copy of the submitted application form
@@ -58,7 +58,7 @@ See scholarships.json
 
 ## Selection Procedure
 
-- **UG:** Admission based purely on merit - the marks secured in the qualifying 10+2 examination. No entrance test for general UG admission.
+- **UG:** No entrance test. Per the UG Prospectus 2026-27, admission is first come, first served for applicants who meet the +2 subject eligibility; an 'Admission Call' message is not a confirmation of admission.
 - **PG:** Admission based on merit (marks in the qualifying UG examination)
 - **MBA MCA:** Admission based on TANCET score followed by counselling, in addition to graduation eligibility
 

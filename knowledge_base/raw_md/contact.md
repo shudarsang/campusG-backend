@@ -6,7 +6,8 @@
 
 ## Phone
 
-+91-44-28279189
+- **Aided stream:** +91-44-28279189
+- **Self-Supporting stream:** +91-44-28220822
 
 ## Fax
 
@@ -28,7 +29,7 @@ Not Available on Official Website in indexed form (search 'Ethiraj College for W
 
 ## Office Timings
 
-- **College Working Hours:** 9:00 a.m. to 2:15 p.m. (per MCA brochure); additional classes conducted after regular working hours as needed
+- **College Working Hours:** Aided programmes 9.00 a.m. to 2.15 p.m.; Self-Supporting programmes 11.30 a.m. to 4.45 p.m. (UG Prospectus 2026-27); additional classes may be held after regular hours
 - **Library Timings:** 9:00 a.m. to 4:00 p.m.
 
 ## Website

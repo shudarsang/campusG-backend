@@ -96,13 +96,13 @@ Ethiraj College has an urban campus, located in Egmore, Chennai.
 
 ### Q16. How many UG programmes does Ethiraj College offer?
 
-Ethiraj College offers around 19-30 UG programmes, depending on the year of reporting.
+Ethiraj College offers 30 UG (undergraduate) programmes across the Aided and Self-Supporting streams (UG Prospectus 2026-27).
 
 **Category:** About College
 
 ### Q17. How many PG programmes does Ethiraj College offer?
 
-Ethiraj College offers around 23-30 PG programmes, depending on the year of reporting.
+Ethiraj College offers 26 PG courses, including the professional courses MBA and MCA, per the UG/MCA Prospectus 2026-27 (the college website lists 24 PG programmes).
 
 **Category:** About College
 
@@ -456,7 +456,7 @@ You apply online via the Admissions section of ethirajcollege.edu.in: register, 
 
 ### Q74. Is there an entrance exam for UG admission at Ethiraj College?
 
-No, UG admission is based purely on merit - the marks secured in the qualifying 10+2 examination.
+No, there is no entrance exam for UG admission. Per the UG Prospectus 2026-27, UG admission is on a first come, first served basis for applicants who meet the +2 subject eligibility of the programme.
 
 **Category:** Admissions
 
@@ -474,7 +474,7 @@ Documents include the 12th mark sheet, UG semester mark sheets (for PG applicant
 
 ### Q77. Can I apply for multiple courses at Ethiraj College?
 
-Yes, a candidate can apply for any number of courses across Aided and Self-Supporting streams.
+Yes, a candidate can apply for any number of courses across Aided and Self-Supporting streams, but each programme needs a separate application form and a separate ₹50 application fee.
 
 **Category:** Admissions
 
@@ -486,7 +486,7 @@ No, once an application is saved/submitted it cannot be edited.
 
 ### Q79. What photo specifications are required for the application?
 
-A recent passport-size photograph, in JPG/JPEG format, with a maximum file size of 100kb; school-uniform or selfie photos are not accepted.
+A recent passport-size photograph, maximum 100 KB, in JPG or GIF format, 125 x 165 pixels; school-uniform or selfie photos are not accepted.
 
 **Category:** Admissions
 
@@ -516,7 +516,7 @@ No lateral entry policy was found on the official website; check directly with t
 
 ### Q84. What is the eligibility for MBA/MCA admission?
 
-Graduation in the relevant discipline plus a valid TANCET score is required for MBA/MCA admission.
+For MCA, you need one of: BCA or B.Sc (Computer Science, Mathematics, Applied Sciences, Physics, Statistics); B.Com, BBA, B.A. Economics or another degree with Business Mathematics and Statistics or Mathematics/Statistics at Main or Allied level; B.Sc Chemistry with allied Mathematics and Physics; B.E., B.Tech. or MBA; or any degree with Mathematics at +2 level. TANCET 2026 marks are mandatory. For MBA, graduation plus a valid TANCET score is required.
 
 **Category:** Admissions
 
@@ -542,7 +542,7 @@ Yes, a valid TANCET score is required for MBA admission at Ethiraj College.
 
 ### Q88. Is there a written entrance test for UG courses?
 
-No, UG admission is based only on merit (marks in the qualifying 10+2 examination), with no separate entrance test.
+No, there is no written entrance test for UG courses. Per the UG Prospectus 2026-27, seats are allotted on a first come, first served basis to applicants who meet the +2 subject eligibility.
 
 **Category:** Entrance Exams
 
@@ -562,13 +562,13 @@ Yes, candidates with valid TANCET scores go through a counselling process, with 
 
 ### Q91. What is the tuition fee for MCA at Ethiraj College?
 
-Not Available on Official Website. Exact fee figures are not published as static data; check the Admissions/Pay Online section or contact the college directly.
+The MCA fee for 2026-27 is ₹70,438 for Semester I, the same for Management quota and Counselling quota (MCA Prospectus 2026-27). The application fee is ₹600, non-refundable.
 
 **Category:** Fees
 
 ### Q92. What is the tuition fee for BCA at Ethiraj College?
 
-Not Available on Official Website. Please check the Admissions section or contact the college directly for current fee figures.
+The BCA (Self-Supporting) fee for 2026-27 is ₹51,531 per semester (UG Prospectus 2026-27).
 
 **Category:** Fees
 
@@ -586,7 +586,7 @@ The website provides an online payment link for hostel fees, but the specific fe
 
 ### Q95. Where can I find the exact fee structure for a specific course?
 
-Exact fee structures are not published as open data; consult the Admissions office or the online payment portal directly for current figures.
+The UG Prospectus 2026-27 lists per-semester fees for all Self-Supporting UG programmes (from ₹25,531 for B.A Business Economics with Data Analytics to ₹61,531 for B.Sc Visual Communication with AI), and the MCA Prospectus 2026-27 gives the MCA fee (₹70,438 for Semester I). Aided UG, other PG, MBA and hostel fees are not published in these documents; for those, see the prospectus on ethirajcollege.edu.in or call 044-28279189 (Aided) / 044-28220822 (Self-Supporting).
 
 **Category:** Fees
 
@@ -880,7 +880,7 @@ principal@ethirajcollege.edu.in.
 
 ### Q142. What are the working hours of Ethiraj College?
 
-College working hours are 9:00 a.m. to 2:15 p.m., with additional classes conducted after regular hours when needed.
+For Government Aided programmes, college starts at 9.00 a.m. and ends at 2.15 p.m. (lunch 11.45 a.m. to 12.25 p.m.). For Self-Supporting programmes, college starts at 11.30 a.m. and ends at 4.45 p.m. (lunch 1.20 p.m. to 2.00 p.m., day-order system). Additional classes may be held after regular hours.
 
 **Category:** Contact
 
@@ -1550,7 +1550,7 @@ Non-CBSE board students can use the 'Add Row' option to include additional subje
 
 ### Q252. Is there an application fee?
 
-An application/registration fee is charged and must be paid online as part of the submission process; the exact current amount is not published in indexed pages.
+Yes. The UG application fee is ₹50 per programme, paid online only and non-refundable; SC/ST candidates are exempted. The MCA application fee is ₹600, non-refundable.
 
 **Category:** Admissions
 
